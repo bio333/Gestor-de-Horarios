@@ -1,0 +1,35 @@
+:root {
+    --app-primary: #006896;
+    --app-primary-dark: #005274;
+    --app-bg: #0b1120;
+}
+
+.bg-app {
+    background: radial-gradient(circle at top, #0f172a, #020617);
+}
+
+.bg-primary-custom {
+    background-color: var(--app-primary) !important;
+}
+
+.btn-primary-custom {
+    background-color: var(--app-primary);
+    border-color: var(--app-primary);
+    font-weight: 600;
+}
+
+.btn-primary-custom:hover {
+    background-color: var(--app-primary-dark);
+    border-color: var(--app-primary-dark);
+}
+
+.btn-outline-primary-custom {
+    color: var(--app-primary);
+    border-color: var(--app-primary);
+    font-weight: 500;
+}
+
+.btn-outline-primary-custom:hover {
+    background-color: var(--app-primary);
+    color: #fff;
+}

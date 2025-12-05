@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Subdirector - Gestor de Horarios</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
+
+    <link rel="stylesheet" href="subdirector.css">
+</head>
+
+<body class="bg-app">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-custom shadow-sm">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-bold">Gestor de Horarios</span>
+            <span class="navbar-text d-none d-sm-inline">
+                Panel del Subdirector
+            </span>
+            <button class="btn btn-sm btn-outline-light ms-auto" onclick="logout()">
+                Cerrar sesión
+            </button>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <h2 class="text-white mb-3">Panel del Subdirector</h2>
+        <p class="text-light mb-4">
+            Desde aquí puedes administrar maestros, materias, edificios y salones.
+        </p>
+
+        <div class="row g-4">
+
+            <!-- Maestros -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary-custom text-white">
+                        Maestros
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Agregar, editar, eliminar maestros y su tipo de contrato.
+                        </p>
+                        <button class="btn btn-primary-custom w-100"
+                            onclick="location.href='/subdirector/maestros.html'">
+                            Ver maestros
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Materias -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary-custom text-white">
+                        Materias
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Gestiona las materias por semestre, créditos y su relación con los grupos.
+                        </p>
+                        <button class="btn btn-primary-custom w-100"
+                            onclick="location.href='/subdirector/materias.html'">
+                            Ver materias
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Edificios y salones -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary-custom text-white">
+                        Edificios y salones
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Consulta los edificios R1, R2 y P, y revisa la disponibilidad de salones.
+                        </p>
+                        <button class="btn btn-primary-custom w-100"
+                            onclick="location.href='/subdirector/salones.html'">
+                            Ver edificios y salones
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="subdirector.js"></script>
+
+    <script>
+        async function generarHorarioAutomatico() {
+            const btn = document.getElementById('btn-generar-horario');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Generando...';
+            }
+
+            try {
+                const res = await fetch('/api/horarios/generar', {
+                    method: 'POST'
+                });
+
+                const data = await res.json();
+                alert(data.mensaje || 'Horario generado.');
+            } catch (err) {
+                console.error('Error generando horario:', err);
+                alert('Error al generar horario.');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Generar horario automático';
+                }
+            }
+        }
+    </script>
+
+
+
+</body>
+
+
+</html>

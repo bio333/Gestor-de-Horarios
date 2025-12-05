@@ -1,0 +1,61 @@
+<!-- public/maestro/menu.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Horarios - Menú Maestro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #0a1a2f;
+            color: #fff;
+        }
+        .navbar {
+            background: #006896;
+        }
+        .card {
+            background: #13233a;
+            border-radius: 16px;
+        }
+        .btn-primary-custom {
+            background: #006896 !important;
+            border-color: #006896 !important;
+            color: #fff !important;
+        }
+        .titulo-blanco {
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark px-4">
+    <span class="navbar-brand">Gestor de Horarios</span>
+    <span class="navbar-text">Menú Maestro</span>
+    <button class="btn btn-light" onclick="location.href='/login/index.html'">Cerrar sesión</button>
+</nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 text-center">
+                <h3 class="mb-4 titulo-blanco">Bienvenido, maestro.</h3>
+
+                <!-- SIGUE IGUAL: seleccionar materias -->
+                <button class="btn btn-primary-custom mb-3"
+                        onclick="location.href='/maestro/mis_materias.html'">
+                    Seleccionar materias que puedo impartir
+                </button>
+
+                <!-- NUEVO: ver mi horario -->
+                <button class="btn btn-primary-custom"
+                        onclick="location.href='/maestro/mi_horario.html'">
+                    Ver mi horario de clases
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
