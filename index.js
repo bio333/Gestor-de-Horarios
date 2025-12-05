@@ -1,4 +1,6 @@
 // index.js
+require('dotenv').config();        // ⬅️ NUEVO
+
 const express = require('express');
 const app = express();
 require('./src/config/db');
@@ -13,14 +15,13 @@ app.use(express.static('src/public'));
 
 // Sesión
 app.use(session({
-    secret: 'gestor-horarios-super-secreto-123',
+    secret: process.env.SESSION_SECRET || 'gestor-horarios-super-secreto-123',
     resave: false,
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 2  // 2 horas
     }
 }));
-
 
 // Rutas API
 app.use('/api', require('./src/routes/maestrosMateriasRoutes'));
@@ -39,12 +40,5 @@ app.listen(PORT, () => {
     console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
 });
 
-
-//Exportar para Railway
+// Exportar para Railway
 module.exports = app;
-
-// redeploy railway
-// redeploy railway
-//// redeploy
-//holaa
-// redeploy railway
