@@ -28,7 +28,6 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Validación visual Bootstrap
     form.classList.add('was-validated');
     if (!form.checkValidity()) return;
 
@@ -39,7 +38,8 @@ form.addEventListener('submit', async (e) => {
     msg.innerHTML = `<div class="alert alert-secondary py-1 mb-0">Verificando credenciales...</div>`;
 
     try {
-        const res = await fetch("http://localhost:3000/api/auth/login", {
+        // 🔹 MISMO DOMINIO, SIN localhost
+        const res = await fetch("/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
@@ -52,14 +52,12 @@ form.addEventListener('submit', async (e) => {
                 Bienvenido <strong>${data.username}</strong>. Rol detectado: <strong>${data.rol}</strong>
             </div>`;
 
-            // 🔹 Guardar info básica del usuario para el front (maestro usa esto)
             try {
                 console.log('Respuesta de login:', data);
 
                 const usuario = {
-                    // Usa el id que te mande tu backend (docente_id, id, userId, etc.)
                     id: data.docente_id || data.id || data.userId || data.usuario_id,
-                    rol: (data.rol || '').toUpperCase(),   // SUBDIRECTOR / JEFE / MAESTRO
+                    rol: (data.rol || '').toUpperCase(),
                     nombre: data.username || ''
                 };
 
@@ -69,7 +67,6 @@ form.addEventListener('submit', async (e) => {
                 console.error('No se pudo guardar usuario en localStorage:', e2);
             }
 
-            // Redirigir según rol
             setTimeout(() => {
                 if (data.rol === 'subdirector') {
                     window.location.href = '/subdirector/menu.html';
