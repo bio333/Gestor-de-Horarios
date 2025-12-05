@@ -21,10 +21,6 @@ app.use(session({
     }
 }));
 
-// Ruta de prueba
-app.get('/', (req, res) => {
-    res.send('Servidor Node.js funcionando correctamente 🚀');
-});
 
 // Rutas API
 app.use('/api', require('./src/routes/maestrosMateriasRoutes'));
