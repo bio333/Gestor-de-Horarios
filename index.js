@@ -38,11 +38,11 @@ app.use('/api/horarios', require('./src/routes/horariosRoutes'));
 app.use('/api/planeacion-semestre', require('./src/routes/planeacionSemestreRoutes'));
 app.use('/api/grupos-materia', require('./src/routes/gruposMateriaRoutes'));
 
-// Puerto para Railway
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
 });
+
 
 // Exportar para Railway
 module.exports = app;
