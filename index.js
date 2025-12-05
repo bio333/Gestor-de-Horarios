@@ -44,5 +44,7 @@ app.listen(PORT, () => {
 });
 
 
-// Exportar para Railway
+//Exportar para Railway
 module.exports = app;
+
+// redeploy railway
