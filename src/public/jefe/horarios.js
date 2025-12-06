@@ -960,35 +960,32 @@ function generarPdfHorarioSemestre() {
     if (tbody) {
         Array.from(tbody.rows).forEach(tr => {
             const rowData = [];
-            Array.from(tr.cells).forEach(td => {
-                // Texto de la celda con saltos de línea normalizados
-                const raw = td.innerText
-                    .replace(/\s*\n\s*/g, '\n') // dejar \n limpios
+            Array.from(tr.cells).forEach((td, cellIndex) => {
+                // Texto base de la celda
+                let raw = td.innerText
+                    .replace(/\s*\n\s*/g, '\n') // normalizar saltos
                     .trim();
 
-                let cellText = raw;
-
-                // Partimos en líneas
-                const lineas = raw
-                    .split('\n')
-                    .map(l => l.trim())
-                    .filter(Boolean);
-
-                // Si hay varias materias en la misma hora:
-                // cada materia = 3 líneas (materia, maestro, salón)
-                if (lineas.length > 3 && lineas.length % 3 === 0) {
-                    const partes = [];
-                    for (let i = 0; i < lineas.length; i += 3) {
-                        const bloque = lineas.slice(i, i + 3).join('\n');
-                        partes.push(bloque);
-                    }
-                    cellText = partes.join('\n-------------------------\n');
-                } else {
-                    // Celdas normales (Libre, RECESO, una sola materia, etc.)
-                    cellText = lineas.join('\n');
+                // Solo tocar columnas de días (no la de "Hora")
+                if (cellIndex > 0 && raw) {
+                    // 🔹 Después de cada línea que empieza con "Salón ...",
+                    // metemos UNA línea en blanco extra.
+                    // Ejemplo:
+                    //  Cálculo...
+                    //  Castrejon...
+                    //  Salón P1-4
+                    //  Vazquez...
+                    //
+                    // se vuelve:
+                    //  Cálculo...
+                    //  Castrejon...
+                    //  Salón P1-4
+                    //
+                    //  Vazquez...
+                    raw = raw.replace(/(Sal[oó]n [^\n]+)/g, '$1\n\n');
                 }
 
-                rowData.push(cellText);
+                rowData.push(raw);
             });
             body.push(rowData);
         });
