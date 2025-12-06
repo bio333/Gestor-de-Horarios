@@ -964,39 +964,31 @@ function generarPdfHorarioSemestre() {
             Array.from(tr.cells).forEach((td, cellIndex) => {
                 let cellText = '';
 
-                // Columna "Hora" tal cual
                 if (cellIndex === 0) {
-                    cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                    // Columna de hora tal cual (respetando saltos)
+                    cellText = td.innerText.replace(/\s*\n\s*/g, '\n').trim();
                 } else {
-                    // Intentar tomar el formato de la celda de CLASE:
-                    //   1) div.fw-bold  -> materia
-                    //   2) primer <small> -> maestro
-                    //   3) segundo <small> -> salón
-                    const titulo = td.querySelector('.fw-bold');
-                    const smalls = td.querySelectorAll('small');
+                    // Tomamos todas las líneas reales de la celda
+                    const lineas = td.innerText
+                        .split('\n')
+                        .map(l => l.trim())
+                        .filter(Boolean);
 
-                    if (titulo || smalls.length) {
-                        const partes = [];
+                    const salida = [];
 
-                        if (titulo) {
-                            partes.push(titulo.innerText.trim());
-                        }
-                        if (smalls[0]) {
-                            partes.push(smalls[0].innerText.trim());
-                        }
-                        if (smalls[1]) {
-                            partes.push(smalls[1].innerText.trim());
-                        }
+                    for (let i = 0; i < lineas.length; i++) {
+                        const linea = lineas[i];
+                        salida.push(linea);
 
-                        // 🔹 Aquí forzamos EXACTAMENTE el formato:
-                        // Materia
-                        // Maestro
-                        // Salón P1-13
-                        cellText = partes.join('\n');
-                    } else {
-                        // Celdas "Libre", "RECESO", etc.
-                        cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                        // 🔹 Si esta línea es un "Salón ...",
+                        // metemos una línea en blanco extra
+                        // (pero solo si no es la última).
+                        if (/^Sal[oó]n\b/i.test(linea) && i < lineas.length - 1) {
+                            salida.push(''); // línea en blanco
+                        }
                     }
+
+                    cellText = salida.join('\n');
                 }
 
                 rowData.push(cellText);
