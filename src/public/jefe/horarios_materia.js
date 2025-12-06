@@ -42,6 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
         modalHorarioSalon = new bootstrap.Modal(modalSalonEl);
     }
 
+        // 🔹 Botón para descargar el horario del semestre en PDF
+    const btnDescargarPdf = document.getElementById('btnDescargarPdf');
+    if (btnDescargarPdf) {
+        btnDescargarPdf.addEventListener('click', generarPdfHorarioSemestre);
+    }
+
+
     construirTablaVacia();
 
     // Inicializar UI de modos (Agregar / Eliminar grupos)
@@ -1537,3 +1544,77 @@ async function verHorarioSalon() {
         mostrarAlerta('Error al cargar el horario del salón.', 'danger');
     }
 }
+
+/* ================== PDF DEL HORARIO POR SEMESTRE ================== */
+
+function generarPdfHorarioSemestre() {
+    const selSem = document.getElementById('selectSemestre');
+    if (!selSem || !selSem.value) {
+        mostrarAlerta('Selecciona un semestre antes de descargar el horario.', 'warning');
+        return;
+    }
+
+    const semestre = selSem.value;
+
+    // jsPDF desde la librería UMD
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF || typeof jsPDF !== 'function') {
+        mostrarAlerta('Error: jsPDF no está disponible.', 'danger');
+        return;
+    }
+
+    const tabla = document.getElementById('tablaHorario');
+    if (!tabla) {
+        mostrarAlerta('No se encontró la tabla del horario.', 'danger');
+        return;
+    }
+
+    const doc = new jsPDF(); // formato estándar
+
+    // Título y datos
+    doc.setFontSize(14);
+    doc.text('Gestor de Horarios - Horario por grupo de materia', 14, 15);
+    doc.setFontSize(12);
+    doc.text(`Semestre: ${semestre}`, 14, 22);
+
+    // ===== Encabezados (thead) =====
+    const head = [];
+    const ths = tabla.querySelectorAll('thead th');
+    const headRow = [];
+    ths.forEach(th => headRow.push(th.innerText.trim()));
+    head.push(headRow);
+
+    // ===== Cuerpo (tbody) =====
+    const body = [];
+    const tbody = document.getElementById('tbodyHorario');
+    if (tbody) {
+        Array.from(tbody.rows).forEach(tr => {
+            const rowData = [];
+            Array.from(tr.cells).forEach(td => {
+                // Limpiar espacios y saltos de línea
+                rowData.push(td.innerText.replace(/\s+/g, ' ').trim());
+            });
+            body.push(rowData);
+        });
+    }
+
+    // autoTable (plugin)
+    if (typeof doc.autoTable === 'function') {
+        doc.autoTable({
+            head,
+            body,
+            startY: 28,
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [0, 104, 150] }
+        });
+    } else {
+        mostrarAlerta('No se encontró el plugin autoTable de jsPDF.', 'danger');
+        return;
+    }
+
+    const nombreArchivo = `Horario_Semestre_${semestre}.pdf`;
+    doc.save(nombreArchivo);
+
+    mostrarAlerta('Horario del semestre descargado en PDF.', 'success');
+}
+

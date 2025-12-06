@@ -181,21 +181,19 @@
 
 
     <nav class="navbar navbar-dark px-4">
-    <a href="/jefe/menu.html" class="navbar-brand">Gestor de Horarios</a>
-    <span class="navbar-text">Horarios por grupo de materia</span>
+        <a href="/jefe/menu.html" class="navbar-brand">Gestor de Horarios</a>
+        <span class="navbar-text">Horarios por grupo de materia</span>
 
-    <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-outline-light"
-                onclick="location.href='/jefe/menu.html'">
-            Regresar
-        </button>
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-light" onclick="location.href='/jefe/menu.html'">
+                Regresar
+            </button>
 
-        <button class="btn btn-light"
-                onclick="location.href='/login/index.html'">
-            Cerrar sesión
-        </button>
-    </div>
-</nav>
+            <button class="btn btn-light" onclick="location.href='/login/index.html'">
+                Cerrar sesión
+            </button>
+        </div>
+    </nav>
 
 
     <div class="container mt-4">
@@ -233,6 +231,12 @@
                         Horario (07:00 a 15:00)
                     </div>
                     <div class="card-body table-responsive">
+                        <!-- 🔹 Botón para descargar PDF del semestre -->
+                        <div class="mb-2 text-end">
+                            <button id="btnDescargarPdf" class="btn btn-primary-custom btn-sm">
+                                Descargar horario en PDF
+                            </button>
+                        </div>
                         <table id="tablaHorario" class="table table-dark align-middle mb-0">
                             <thead>
                                 <tr>
@@ -266,7 +270,8 @@
                                 <option value="">Selecciona un grupo...</option>
                             </select>
                             <div class="form-text">
-                                El horario siempre muestra todos los grupos del semestre, pero aquí eliges cuál vas a editar.
+                                El horario siempre muestra todos los grupos del semestre, pero aquí eliges cuál vas a
+                                editar.
                             </div>
                         </div>
 
@@ -293,7 +298,8 @@
                                 <option value="">Selecciona una hora...</option>
                             </select>
                             <div class="form-text">
-                                La hora se elige siempre aquí. El sistema asignará automáticamente los días según los créditos de la materia.
+                                La hora se elige siempre aquí. El sistema asignará automáticamente los días según los
+                                créditos de la materia.
                             </div>
                         </div>
 
@@ -304,7 +310,8 @@
                                 <option value="">(La materia está fija por el grupo)</option>
                             </select>
                             <div class="form-text">
-                                Este grupo ya tiene una materia asociada. Los créditos de la materia definen cuántos días se asignan.
+                                Este grupo ya tiene una materia asociada. Los créditos de la materia definen cuántos
+                                días se asignan.
                             </div>
                         </div>
 
@@ -336,8 +343,7 @@
                                 class="btn btn-outline-primary-custom btn-sm">
                                 Ver horario del maestro
                             </button>
-                            <button id="btnVerHorarioSalon" type="button"
-                                class="btn btn-outline-secondary btn-sm">
+                            <button id="btnVerHorarioSalon" type="button" class="btn btn-outline-secondary btn-sm">
                                 Ver horario del salón
                             </button>
                         </div>
@@ -414,6 +420,11 @@
 
     <!-- Bootstrap + JS de la página -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 🔹 Librerías para generar PDF -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
     <script src="/jefe/horarios_materia.js"></script>
 </body>
 
