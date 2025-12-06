@@ -1,3 +1,5 @@
+// src/public/jefe/salones_horario.js
+
 const API_SALONES = '/api/salones';
 const API_HORARIO_SALON = '/api/horarios/salon';
 
@@ -34,23 +36,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cargarSalones();
 
-    const btnVerHorario = document.getElementById('btnVerHorario');
-    if (btnVerHorario) {
-        btnVerHorario.addEventListener('click', () => {
-            const selectSalon = document.getElementById('selectSalon');
-            if (!selectSalon) return;
-
+    // Cuando cambie el salón, se carga automáticamente el horario
+    const selectSalon = document.getElementById('selectSalon');
+    if (selectSalon) {
+        selectSalon.addEventListener('change', () => {
             const salonId = selectSalon.value;
-            if (!salonId) {
-                mostrarAlerta('Selecciona un salón primero.', 'warning');
-                return;
-            }
+            const textoSalon =
+                selectSalon.options[selectSalon.selectedIndex]?.textContent || '';
 
-            const textoSalon = selectSalon.options[selectSalon.selectedIndex].textContent;
-            cargarHorarioSalon(salonId, textoSalon);
+            if (salonId) {
+                cargarHorarioSalon(salonId, textoSalon);
+            } else {
+                limpiarHorarioSalon();
+            }
         });
     }
 
+    // Botón para descargar PDF
     const btnDescargarPdf = document.getElementById('btnDescargarPdfSalon');
     if (btnDescargarPdf) {
         btnDescargarPdf.addEventListener('click', generarPdfHorarioSalon);
@@ -95,6 +97,18 @@ async function cargarSalones() {
         console.error('❌ Error en cargarSalones (jefe):', err);
         mostrarAlerta('Error al cargar salones.', 'danger');
     }
+}
+
+function limpiarHorarioSalon() {
+    // Limpia la tabla y el título
+    const tbody = document.getElementById('tbodyHorario');
+    if (tbody) tbody.innerHTML = '';
+
+    const tituloSalon = document.getElementById('tituloSalonSeleccionado');
+    if (tituloSalon) tituloSalon.textContent = '';
+
+    salonSeleccionadoId = null;
+    salonSeleccionadoNombre = '';
 }
 
 async function cargarHorarioSalon(salonId, textoSalon) {
@@ -210,9 +224,9 @@ async function cargarHorarioSalon(salonId, textoSalon) {
 /* =============== PDF HORARIO POR SALÓN =============== */
 
 function generarPdfHorarioSalon() {
-    // Debe haber un salón cargado
+    // Debe haber un salón seleccionado
     if (!salonSeleccionadoId) {
-        mostrarAlerta('Selecciona un salón y carga su horario antes de descargar el PDF.', 'warning');
+        mostrarAlerta('Selecciona un salón antes de descargar el PDF.', 'warning');
         return;
     }
 
@@ -250,7 +264,7 @@ function generarPdfHorarioSalon() {
         Array.from(tbody.rows).forEach(tr => {
             const rowData = [];
             Array.from(tr.cells).forEach(td => {
-                let text = td.innerText
+                const text = td.innerText
                     .replace(/\s*\n\s*/g, '\n') // compactar saltos
                     .trim();
                 rowData.push(text);
