@@ -1244,11 +1244,6 @@ async function eliminarHorarioGrupoCompleto(grupoIdParam) {
     }
 
     if (errores.length) {
-        mostrarAlerta(
-            'Se produjeron algunos errores al eliminar el horario:<br>' + errores.join('<br>'),
-            'danger'
-        );
-    } else {
         mostrarAlerta('Se eliminó completamente el horario de este grupo.', 'success');
     }
 
