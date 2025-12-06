@@ -882,7 +882,6 @@ function onClickCelda(ev) {
     const dia = DIAS[colIndex - 1];
 
     if (td.classList.contains('celda-receso')) {
-        mostrarAlerta('Este bloque es de RECESO y no se puede editar.', 'warning');
         return;
     }
 
