@@ -961,26 +961,30 @@ function generarPdfHorarioSemestre() {
         Array.from(tbody.rows).forEach(tr => {
             const rowData = [];
             Array.from(tr.cells).forEach(td => {
-
                 let cellText = '';
 
-                // Si la celda tiene varios grupos (multigrupo)
-                const multi = td.querySelector('.celda-multi-grupo');
-                if (multi) {
-                    const bloques = multi.querySelectorAll('.bloque-grupo');
+                // 🔹 ¿Hay uno o más .bloque-grupo dentro de la celda?
+                const bloques = td.querySelectorAll('.bloque-grupo');
+
+                if (bloques.length > 0) {
                     const partes = [];
 
                     bloques.forEach(bg => {
-                        // Texto del bloque (materia, maestro, salón) en una sola línea
-                        const txtBloque = bg.innerText.replace(/\s+/g, ' ').trim();
+                        // Conservamos saltos de línea internos del bloque
+                        let txtBloque = bg.innerText
+                            .replace(/\s*\n\s*/g, '\n') // normaliza saltos
+                            .trim();
+
                         partes.push(txtBloque);
                     });
 
-                    // Separar bloques con una "línea" de guiones y saltos de línea
+                    // Separar bloques con una "línea" y saltos de línea
                     cellText = partes.join('\n-------------------------\n');
                 } else {
-                    // Celdas normales: colapsar espacios pero NO necesitamos varias líneas
-                    cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                    // Celdas normales: dejamos los saltos de línea, solo limpiamos espacios alrededor
+                    cellText = td.innerText
+                        .replace(/\s*\n\s*/g, '\n') // conservar líneas
+                        .trim();
                 }
 
                 rowData.push(cellText);
@@ -997,7 +1001,7 @@ function generarPdfHorarioSemestre() {
             startY: 28,
             styles: {
                 fontSize: 8,
-                valign: 'top' // para que la celda empiece arriba si hay muchas líneas
+                valign: 'top'   // celda empieza arriba si hay muchas líneas
             },
             headStyles: { fillColor: [0, 104, 150] }
         });
