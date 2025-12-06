@@ -1590,10 +1590,48 @@ function generarPdfHorarioSemestre() {
     if (tbody) {
         Array.from(tbody.rows).forEach(tr => {
             const rowData = [];
-            Array.from(tr.cells).forEach(td => {
-                // Limpiar espacios y saltos de línea
-                rowData.push(td.innerText.replace(/\s+/g, ' ').trim());
+
+            Array.from(tr.cells).forEach((td, cellIndex) => {
+                let cellText = '';
+
+                // Columna "Hora" tal cual
+                if (cellIndex === 0) {
+                    cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                } else {
+                    // Intentar tomar el formato de la celda de CLASE:
+                    //   1) div.fw-bold  -> materia
+                    //   2) primer <small> -> maestro
+                    //   3) segundo <small> -> salón
+                    const titulo = td.querySelector('.fw-bold');
+                    const smalls = td.querySelectorAll('small');
+
+                    if (titulo || smalls.length) {
+                        const partes = [];
+
+                        if (titulo) {
+                            partes.push(titulo.innerText.trim());
+                        }
+                        if (smalls[0]) {
+                            partes.push(smalls[0].innerText.trim());
+                        }
+                        if (smalls[1]) {
+                            partes.push(smalls[1].innerText.trim());
+                        }
+
+                        // 🔹 Aquí forzamos EXACTAMENTE el formato:
+                        // Materia
+                        // Maestro
+                        // Salón P1-13
+                        cellText = partes.join('\n');
+                    } else {
+                        // Celdas "Libre", "RECESO", etc.
+                        cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                    }
+                }
+
+                rowData.push(cellText);
             });
+
             body.push(rowData);
         });
     }
@@ -1604,7 +1642,10 @@ function generarPdfHorarioSemestre() {
             head,
             body,
             startY: 28,
-            styles: { fontSize: 8 },
+            styles: {
+                fontSize: 8,
+                valign: 'top' // que empiece arriba si hay muchas líneas
+            },
             headStyles: { fillColor: [0, 104, 150] }
         });
     } else {
