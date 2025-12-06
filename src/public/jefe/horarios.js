@@ -961,30 +961,31 @@ function generarPdfHorarioSemestre() {
         Array.from(tbody.rows).forEach(tr => {
             const rowData = [];
             Array.from(tr.cells).forEach(td => {
-                let cellText = '';
+                // Texto de la celda con saltos de línea normalizados
+                const raw = td.innerText
+                    .replace(/\s*\n\s*/g, '\n') // dejar \n limpios
+                    .trim();
 
-                // 🔹 ¿Hay uno o más .bloque-grupo dentro de la celda?
-                const bloques = td.querySelectorAll('.bloque-grupo');
+                let cellText = raw;
 
-                if (bloques.length > 0) {
+                // Partimos en líneas
+                const lineas = raw
+                    .split('\n')
+                    .map(l => l.trim())
+                    .filter(Boolean);
+
+                // Si hay varias materias en la misma hora:
+                // cada materia = 3 líneas (materia, maestro, salón)
+                if (lineas.length > 3 && lineas.length % 3 === 0) {
                     const partes = [];
-
-                    bloques.forEach(bg => {
-                        // Conservamos saltos de línea internos del bloque
-                        let txtBloque = bg.innerText
-                            .replace(/\s*\n\s*/g, '\n') // normaliza saltos
-                            .trim();
-
-                        partes.push(txtBloque);
-                    });
-
-                    // Separar bloques con una "línea" y saltos de línea
+                    for (let i = 0; i < lineas.length; i += 3) {
+                        const bloque = lineas.slice(i, i + 3).join('\n');
+                        partes.push(bloque);
+                    }
                     cellText = partes.join('\n-------------------------\n');
                 } else {
-                    // Celdas normales: dejamos los saltos de línea, solo limpiamos espacios alrededor
-                    cellText = td.innerText
-                        .replace(/\s*\n\s*/g, '\n') // conservar líneas
-                        .trim();
+                    // Celdas normales (Libre, RECESO, una sola materia, etc.)
+                    cellText = lineas.join('\n');
                 }
 
                 rowData.push(cellText);
@@ -1001,7 +1002,7 @@ function generarPdfHorarioSemestre() {
             startY: 28,
             styles: {
                 fontSize: 8,
-                valign: 'top'   // celda empieza arriba si hay muchas líneas
+                valign: 'top' // que empiece arriba si hay muchas líneas
             },
             headStyles: { fillColor: [0, 104, 150] }
         });
@@ -1015,4 +1016,5 @@ function generarPdfHorarioSemestre() {
 
     mostrarAlerta('Horario del semestre descargado en PDF.', 'success');
 }
+
 
