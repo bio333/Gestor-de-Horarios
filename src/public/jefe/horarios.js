@@ -961,8 +961,29 @@ function generarPdfHorarioSemestre() {
         Array.from(tbody.rows).forEach(tr => {
             const rowData = [];
             Array.from(tr.cells).forEach(td => {
-                // Limpiar espacios y saltos de línea
-                rowData.push(td.innerText.replace(/\s+/g, ' ').trim());
+
+                let cellText = '';
+
+                // Si la celda tiene varios grupos (multigrupo)
+                const multi = td.querySelector('.celda-multi-grupo');
+                if (multi) {
+                    const bloques = multi.querySelectorAll('.bloque-grupo');
+                    const partes = [];
+
+                    bloques.forEach(bg => {
+                        // Texto del bloque (materia, maestro, salón) en una sola línea
+                        const txtBloque = bg.innerText.replace(/\s+/g, ' ').trim();
+                        partes.push(txtBloque);
+                    });
+
+                    // Separar bloques con una "línea" de guiones y saltos de línea
+                    cellText = partes.join('\n-------------------------\n');
+                } else {
+                    // Celdas normales: colapsar espacios pero NO necesitamos varias líneas
+                    cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                }
+
+                rowData.push(cellText);
             });
             body.push(rowData);
         });
@@ -974,7 +995,10 @@ function generarPdfHorarioSemestre() {
             head,
             body,
             startY: 28,
-            styles: { fontSize: 8 },
+            styles: {
+                fontSize: 8,
+                valign: 'top' // para que la celda empiece arriba si hay muchas líneas
+            },
             headStyles: { fillColor: [0, 104, 150] }
         });
     } else {
