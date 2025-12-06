@@ -541,6 +541,8 @@ function construirTablaVacia() {
 
 // =================== CARGAR GRUPOS POR SEMESTRE ===================
 
+// =================== CARGAR GRUPOS POR SEMESTRE ===================
+
 async function cargarGruposPorSemestre() {
     const selSem = document.getElementById('selectSemestre');
     const selGrupo = document.getElementById('selectGrupo');
@@ -566,6 +568,7 @@ async function cargarGruposPorSemestre() {
             return;
         }
 
+        // Guardamos TODOS en cache (aunque algunos no se muestren)
         gruposMateriaCache = await res.json();
 
         if (!gruposMateriaCache.length) {
@@ -573,27 +576,50 @@ async function cargarGruposPorSemestre() {
             return;
         }
 
+        // Primero llenamos materiasCache
         gruposMateriaCache.forEach(g => {
             materiasCache[g.materia_id] = {
                 id: g.materia_id,
                 nombre: g.materia_nombre,
                 creditos: g.materia_creditos
             };
-
-            const opt = document.createElement('option');
-            opt.value = g.id; // id de grupos_materia
-            opt.textContent = `${g.materia_nombre} (${g.nombre_grupo})`;
-            opt.dataset.semestre = g.semestre;
-            opt.dataset.materiaId = g.materia_id;
-            opt.dataset.materiaNombre = g.materia_nombre;
-            opt.dataset.materiaCreditos = g.materia_creditos;
-            opt.dataset.nombreGrupo = g.nombre_grupo;
-            opt.dataset.grupoTexto = opt.textContent;
-            selGrupo.appendChild(opt);
         });
 
+        // Ahora solo agregamos al <select> los que NO tienen todas sus horas asignadas
+        for (const g of gruposMateriaCache) {
+            try {
+                const resUsos = await fetch(
+                    `/api/horarios/materias/usadas-por-grupo/${g.id}`
+                );
+                const usadasPorMateria = await resUsos.json(); // { materia_id: usadas }
+                const usadas = usadasPorMateria[g.materia_id] || 0;
+
+                // Si ya tiene todos los créditos cubiertos, NO lo mostramos
+                if (usadas >= g.materia_creditos) {
+                    continue;
+                }
+
+                const opt = document.createElement('option');
+                opt.value = g.id; // id de grupos_materia
+                opt.textContent = `${g.materia_nombre} (${g.nombre_grupo})`;
+                opt.dataset.semestre = g.semestre;
+                opt.dataset.materiaId = g.materia_id;
+                opt.dataset.materiaNombre = g.materia_nombre;
+                opt.dataset.materiaCreditos = g.materia_creditos;
+                opt.dataset.nombreGrupo = g.nombre_grupo;
+                opt.dataset.grupoTexto = opt.textContent;
+                selGrupo.appendChild(opt);
+            } catch (e) {
+                console.error(
+                    'Error verificando horas usadas para grupo_materia',
+                    g.id,
+                    e
+                );
+            }
+        }
+
         mostrarAlerta(
-            'En el panel elige el <strong>grupo de materia</strong> que vas a editar. El horario muestra TODOS los grupos del semestre.',
+            'Solo se muestran los grupos de materia que todavía tienen horas por asignar en este semestre.',
             'success'
         );
     } catch (err) {
@@ -601,6 +627,7 @@ async function cargarGruposPorSemestre() {
         mostrarAlerta('Error al cargar grupos de la materia.', 'danger');
     }
 }
+
 
 // =================== CARGAR HORARIO DEL SEMESTRE ===================
 
