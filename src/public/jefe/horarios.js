@@ -960,33 +960,48 @@ function generarPdfHorarioSemestre() {
     if (tbody) {
         Array.from(tbody.rows).forEach(tr => {
             const rowData = [];
-            Array.from(tr.cells).forEach((td, cellIndex) => {
-                // Texto base de la celda
-                let raw = td.innerText
-                    .replace(/\s*\n\s*/g, '\n') // normalizar saltos
-                    .trim();
 
-                // Solo tocar columnas de días (no la de "Hora")
-                if (cellIndex > 0 && raw) {
-                    // 🔹 Después de cada línea que empieza con "Salón ...",
-                    // metemos UNA línea en blanco extra.
-                    // Ejemplo:
-                    //  Cálculo...
-                    //  Castrejon...
-                    //  Salón P1-4
-                    //  Vazquez...
-                    //
-                    // se vuelve:
-                    //  Cálculo...
-                    //  Castrejon...
-                    //  Salón P1-4
-                    //
-                    //  Vazquez...
-                    raw = raw.replace(/(Sal[oó]n [^\n]+)/g, '$1\n\n');
+            Array.from(tr.cells).forEach((td, cellIndex) => {
+                let cellText = '';
+
+                // Columna "Hora" tal cual
+                if (cellIndex === 0) {
+                    cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                } else {
+                    // Intentar tomar el formato de la celda de CLASE:
+                    //   1) div.fw-bold  -> materia
+                    //   2) primer <small> -> maestro
+                    //   3) segundo <small> -> salón
+                    const titulo = td.querySelector('.fw-bold');
+                    const smalls = td.querySelectorAll('small');
+
+                    if (titulo || smalls.length) {
+                        const partes = [];
+
+                        if (titulo) {
+                            partes.push(titulo.innerText.trim());
+                        }
+                        if (smalls[0]) {
+                            partes.push(smalls[0].innerText.trim());
+                        }
+                        if (smalls[1]) {
+                            partes.push(smalls[1].innerText.trim());
+                        }
+
+                        // 🔹 Aquí forzamos EXACTAMENTE el formato:
+                        // Materia
+                        // Maestro
+                        // Salón P1-13
+                        cellText = partes.join('\n');
+                    } else {
+                        // Celdas "Libre", "RECESO", etc.
+                        cellText = td.innerText.replace(/\s+/g, ' ').trim();
+                    }
                 }
 
-                rowData.push(raw);
+                rowData.push(cellText);
             });
+
             body.push(rowData);
         });
     }
