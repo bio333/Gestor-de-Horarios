@@ -5,6 +5,8 @@ const HORA_INICIO = 7;
 const HORA_FIN = 15;
 
 let MAESTRO_LOGUEADO = null;
+// 🔹 Nombre para usar en el PDF
+let NOMBRE_MAESTRO = 'Maestro';
 
 document.addEventListener('DOMContentLoaded', async () => {
     construirTablaVacia();
@@ -18,6 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             'danger'
         );
         return;
+    }
+
+    // 🔹 Evento para descargar el PDF del horario
+    const btnPdf = document.getElementById('btnDescargarPdf');
+    if (btnPdf) {
+        btnPdf.addEventListener('click', generarPdfHorario);
     }
 
     try {
@@ -125,6 +133,9 @@ function pintarResumenMaestro(info) {
     const horasAsignadas = Number(info.horas_asignadas || 0);
     const horasLibres = Math.max(horasContrato - horasAsignadas, 0);
 
+    // 🔹 Guardamos el nombre para usarlo en el PDF
+    NOMBRE_MAESTRO = info.nombre || 'Maestro';
+
     cont.innerHTML = `
         <div class="card mb-3">
             <div class="card-body text-center">
@@ -175,13 +186,82 @@ function pintarHorario(bloques) {
         Salón ${b.salon_clave || b.salon || '-'}
     </div>
 `;
-
             }
         });
     }
 
     if (!bloques.length) {
         mostrarAlerta('Aún no tienes clases asignadas en el horario.', 'info');
+    }
+}
+
+/* ================== Generar PDF del horario ================== */
+
+function generarPdfHorario() {
+    try {
+        const { jsPDF } = window.jspdf || {};
+        if (!jsPDF || typeof jsPDF !== 'function' || !window.jspdf) {
+            mostrarAlerta('Error: jsPDF no está disponible.', 'danger');
+            return;
+        }
+
+        const doc = new jsPDF();
+
+        // Título y datos del maestro
+        doc.setFontSize(14);
+        doc.text('Gestor de Horarios - Mi horario', 14, 15);
+        doc.setFontSize(12);
+        doc.text(`Maestro: ${NOMBRE_MAESTRO}`, 14, 22);
+
+        const tabla = document.querySelector('table');
+        if (!tabla) {
+            mostrarAlerta('No se encontró la tabla del horario.', 'danger');
+            return;
+        }
+
+        // Encabezados
+        const head = [];
+        const ths = tabla.querySelectorAll('thead th');
+        const headRow = [];
+        ths.forEach(th => headRow.push(th.innerText.trim()));
+        head.push(headRow);
+
+        // Cuerpo
+        const body = [];
+        const tbody = document.getElementById('tbodyHorario');
+        if (tbody) {
+            Array.from(tbody.rows).forEach(tr => {
+                const rowData = [];
+                Array.from(tr.cells).forEach(td => {
+                    rowData.push(td.innerText.replace(/\s+/g, ' ').trim());
+                });
+                body.push(rowData);
+            });
+        }
+
+        // autoTable
+        if (typeof doc.autoTable === 'function') {
+            doc.autoTable({
+                head,
+                body,
+                startY: 28,
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [0, 104, 150] }
+            });
+        } else {
+            mostrarAlerta('No se encontró el plugin autoTable de jsPDF.', 'danger');
+            return;
+        }
+
+        const nombreArchivo = `Horario_${(NOMBRE_MAESTRO || 'maestro')
+            .replace(/\s+/g, '_')
+            .replace(/[^\w_]/g, '')}.pdf`;
+
+        doc.save(nombreArchivo);
+        mostrarAlerta('Horario descargado en PDF.', 'success');
+    } catch (e) {
+        console.error(e);
+        mostrarAlerta('Error al generar el PDF del horario.', 'danger');
     }
 }
 
