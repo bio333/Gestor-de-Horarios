@@ -236,7 +236,17 @@ function generarPdfHorarioSalon() {
         return;
     }
 
-    const tabla = document.getElementById('tablaHorarioSalon');
+    // Intentar encontrar la tabla por ID
+    let tabla = document.getElementById('tablaHorarioSalon');
+
+    // Fallback: si por alguna razón no la encuentra por ID,
+    // toma la primera tabla dentro del card del horario.
+    if (!tabla) {
+        tabla = document.querySelector('.card table.table');
+    }
+
+    console.log('🧪 Tabla para PDF:', tabla);
+
     if (!tabla) {
         mostrarAlerta('No se encontró la tabla del horario del salón.', 'danger');
         return;
